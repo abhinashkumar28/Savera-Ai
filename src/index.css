@@ -1,25 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  /* Savera AI palette — forest green + warm gold */
-  --color-savera-bg: #15370D;
-  --color-savera-bg-deep: #0d2408;
-  --color-savera-surface: #1a4210;
-  --color-savera-card: #1f4d14;
-  --color-savera-border: #2d5e23;
-  --color-savera-border-light: #728E6D;
-  --color-savera-sage: #728E6D;
-  --color-savera-amber: #E5CD82;
-  --color-savera-amber-light: #FFF2B4;
-  --color-savera-amber-dim: #b89f5a;
-  --color-savera-teal: #728E6D;
-  --color-savera-teal-dim: #4a6b42;
-  --color-savera-text: #f0ead6;
-  --color-savera-text-dim: #a8b8a0;
+  --color-savera-bg: #080b14;
+  --color-savera-bg-deep: #050810;
+  --color-savera-surface: #0f1420;
+  --color-savera-card: #151b2b;
+  --color-savera-border: #1e2640;
+  --color-savera-amber: #f59e0b;
+  --color-savera-amber-light: #fbbf24;
+  --color-savera-amber-dim: #92400e;
+  --color-savera-teal: #14b8a6;
+  --color-savera-teal-dim: #0f766e;
+  --color-savera-text: #e5e7eb;
+  --color-savera-text-dim: #9ca3af;
   --color-savera-danger: #ef4444;
   --color-savera-warning: #f97316;
-  --color-savera-success: #4ade80;
-  --color-savera-info: #60a5fa;
+  --color-savera-success: #22c55e;
+  --color-savera-info: #3b82f6;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
@@ -32,9 +29,9 @@ html, body, #root {
   padding: 0;
   width: 100%;
   height: 100%;
-  background-color: #15370D;
-  color: #f0ead6;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-savera-bg);
+  color: var(--color-savera-text);
+  font-family: var(--font-sans);
 }
 
 /* Scrollbar styling */
@@ -43,18 +40,18 @@ html, body, #root {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #15370D;
+  background: var(--color-savera-bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #2d5e23;
+  background: var(--color-savera-border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #728E6D;
+  background: #2d3a5c;
 }
 
-/* Network graph canvas */
-.network-graph-canvas canvas {
+/* Orbital sphere canvas */
+.threeui-background.orbital-sphere canvas {
   width: 100%;
   height: 100%;
   display: block;
@@ -62,8 +59,8 @@ html, body, #root {
 
 /* Chart tooltip override */
 .recharts-default-tooltip {
-  background: #1f4d14 !important;
-  border: 1px solid #2d5e23 !important;
+  background: var(--color-savera-card) !important;
+  border: 1px solid var(--color-savera-border) !important;
   border-radius: 8px !important;
 }
 
@@ -73,15 +70,7 @@ html, body, #root {
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-up {
-  animation: fadeUp 0.5s ease-out forwards;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.animate-fade-in {
-  animation: fadeIn 0.8s ease-out forwards;
+  animation: fadeUp 0.4s ease-out forwards;
 }
 
 @keyframes pulse-soft {
@@ -90,12 +79,4 @@ html, body, #root {
 }
 .animate-pulse-soft {
   animation: pulse-soft 2s ease-in-out infinite;
-}
-
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(229, 205, 130, 0.2); }
-  50% { box-shadow: 0 0 40px rgba(229, 205, 130, 0.4); }
-}
-.animate-glow-pulse {
-  animation: glow-pulse 3s ease-in-out infinite;
 }
