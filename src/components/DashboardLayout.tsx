@@ -32,12 +32,25 @@ const navItems = [
   { path: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];
 
+const C = {
+  bg: "#15370D",
+  bgDeep: "#0d2408",
+  surface: "#1a4210",
+  card: "#1f4d14",
+  border: "#2d5e23",
+  sage: "#728E6D",
+  gold: "#E5CD82",
+  goldLight: "#FFF2B4",
+  text: "#f0ead6",
+  textDim: "#a8b8a0",
+};
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-savera-bg overflow-hidden">
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: C.bg }}>
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -48,22 +61,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:static z-40 h-full w-64 bg-savera-surface border-r border-savera-border flex flex-col transition-transform duration-200 ${
+        className={`fixed md:static z-40 h-full w-64 flex flex-col transition-transform duration-200 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
+        style={{ backgroundColor: C.surface, borderRight: `1px solid ${C.border}` }}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-savera-border">
+        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-savera-amber/20 border border-savera-amber/30">
-              <Zap className="h-4 w-4 text-savera-amber" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border" style={{ backgroundColor: `${C.gold}26`, borderColor: `${C.gold}4D` }}>
+              <Zap className="h-4 w-4" style={{ color: C.gold }} />
             </div>
-            <span className="text-base font-semibold text-white tracking-tight">
-              Savera<span className="text-savera-amber">AI</span>
+            <span className="text-base font-semibold tracking-tight" style={{ color: C.text }}>
+              Savera<span style={{ color: C.gold }}>AI</span>
             </span>
           </Link>
           <button
-            className="md:hidden text-savera-text-dim hover:text-white"
+            className="md:hidden"
+            style={{ color: C.textDim }}
             onClick={() => setSidebarOpen(false)}
           >
             <X className="h-5 w-5" />
@@ -80,11 +95,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   key={item.path}
                   to={item.path}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                    isActive
-                      ? "bg-savera-amber/10 text-savera-amber font-medium"
-                      : "text-savera-text-dim hover:text-white hover:bg-savera-card"
-                  }`}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors"
+                  style={{
+                    backgroundColor: isActive ? `${C.gold}1A` : "transparent",
+                    color: isActive ? C.gold : C.textDim,
+                    fontWeight: isActive ? 500 : 400,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = C.card;
+                      e.currentTarget.style.color = C.text;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = C.textDim;
+                    }
+                  }}
                 >
                   <item.icon className="h-4 w-4 flex-shrink-0" />
                   <span>{item.label}</span>
@@ -96,10 +124,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* Demo mode badge */}
-        <div className="px-4 py-3 border-t border-savera-border">
-          <div className="rounded-lg bg-savera-amber/5 border border-savera-amber/20 px-3 py-2">
-            <p className="text-xs text-savera-amber-light font-medium">Demo Mode</p>
-            <p className="text-xs text-savera-text-dim mt-0.5">Using simulated data</p>
+        <div className="px-4 py-3" style={{ borderTop: `1px solid ${C.border}` }}>
+          <div className="rounded-lg px-3 py-2 border" style={{ backgroundColor: `${C.gold}0D`, borderColor: `${C.gold}33` }}>
+            <p className="text-xs font-medium" style={{ color: C.goldLight }}>Demo Mode</p>
+            <p className="text-xs mt-0.5" style={{ color: C.textDim }}>Using simulated data</p>
           </div>
         </div>
       </aside>
@@ -107,24 +135,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-savera-border bg-savera-surface">
+        <header className="flex items-center justify-between px-4 md:px-6 py-3" style={{ backgroundColor: C.surface, borderBottom: `1px solid ${C.border}` }}>
           <button
-            className="md:hidden text-savera-text-dim hover:text-white"
+            className="md:hidden"
+            style={{ color: C.textDim }}
             onClick={() => setSidebarOpen(true)}
           >
             <Menu className="h-5 w-5" />
           </button>
           <div className="hidden md:block">
-            <h1 className="text-sm font-medium text-white">
+            <h1 className="text-sm font-medium" style={{ color: C.text }}>
               {navItems.find((n) => n.path === location.pathname)?.label || "Overview"}
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-savera-text-dim hidden sm:block">
+            <span className="text-xs hidden sm:block" style={{ color: C.textDim }}>
               Campus: North Region
             </span>
-            <div className="h-8 w-8 rounded-full bg-savera-amber/20 border border-savera-amber/30 flex items-center justify-center">
-              <span className="text-xs font-semibold text-savera-amber">A</span>
+            <div className="h-8 w-8 rounded-full flex items-center justify-center border" style={{ backgroundColor: `${C.gold}33`, borderColor: `${C.gold}4D` }}>
+              <span className="text-xs font-semibold" style={{ color: C.gold }}>A</span>
             </div>
           </div>
         </header>
