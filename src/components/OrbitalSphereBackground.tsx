@@ -81,10 +81,12 @@ export function OrbitalSphereBackground({
   return (
     <div
       ref={hostRef}
-      className={`threeui-background orbital-sphere${className ? ` ${className}` : ""}`}
+      className={`threeui-background orbital-sphere absolute inset-0 w-full h-full${className ? ` ${className}` : ""}`}
+      style={{ backgroundColor: '#080b14' }}
     >
       <canvas
         ref={canvasRef}
+        className="w-full h-full block"
         style={{ filter: `hue-rotate(${optionsRef.current.hue - 35}deg)` }}
       />
     </div>
