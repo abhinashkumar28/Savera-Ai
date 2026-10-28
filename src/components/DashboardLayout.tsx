@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import {
   Zap,
   LayoutDashboard,
@@ -16,6 +17,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  LogOut,
 } from "lucide-react";
 
 const navItems = [
@@ -34,7 +36,9 @@ const navItems = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
     <div className="flex h-screen bg-savera-bg overflow-hidden">
@@ -121,11 +125,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-savera-text-dim hidden sm:block">
-              Campus: North Region
+              {user ? `${user.name} • ${user.role}` : "Campus: North Region"}
             </span>
-            <div className="h-8 w-8 rounded-full bg-savera-amber/20 border border-savera-amber/30 flex items-center justify-center">
-              <span className="text-xs font-semibold text-savera-amber">A</span>
-            </div>
+            {user && (
+              <button
+                onClick={() => { logout(); navigate("/login"); }}
+                className="h-8 w-8 rounded-full bg-savera-amber/20 border border-savera-amber/30 flex items-center justify-center hover:bg-savera-amber/30 transition-colors"
+                title="Logout"
+              >
+                <LogOut className="h-3.5 w-3.5 text-savera-amber" />
+              </button>
+            )}
+            {!user && (
+              <div className="h-8 w-8 rounded-full bg-savera-amber/20 border border-savera-amber/30 flex items-center justify-center">
+                <span className="text-xs font-semibold text-savera-amber">A</span>
+              </div>
+            )}
           </div>
         </header>
 

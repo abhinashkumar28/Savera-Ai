@@ -1,0 +1,423 @@
+// Prisma Schema for Savera AI
+// Database: PostgreSQL (recommended) or MySQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ USER & AUTHENTICATION ============
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  role          UserRole  @default(STAFF)
+  phone         String?
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  auditLogs     AuditLog[]
+  smsCampaigns  SMSCampaign[]
+  tasks         Task[]         @relation("AssignedTasks")
+  createdTasks  Task[]         @relation("CreatedTasks")
+  recommendations Recommendation[] @relation("AcceptedBy")
+
+  @@index([email])
+  @@index([role])
+}
+
+enum UserRole {
+  ADMIN
+  FACILITY_MANAGER
+  STAFF
+}
+
+// ============ BUILDINGS & STRUCTURE ============
+
+model Campus {
+  id          String    @id @default(cuid())
+  name        String
+  location    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  buildings   Building[]
+}
+
+model Building {
+  id            String    @id @default(cuid())
+  name          String
+  location      String
+  type          BuildingType
+  floors        Int
+  occupancy     Int
+  managerId     String?
+  campusId      String
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  campus        Campus    @relation(fields: [campusId], references: [id])
+  manager       User?     @relation("BuildingManager", fields: [managerId], references: [id])
+  readings      EnergyReading[]
+  anomalies     Anomaly[]
+  contacts      Contact[]
+  tasks         Task[]
+  recommendations Recommendation[]
+
+  @@index([campusId])
+  @@index([name])
+}
+
+enum BuildingType {
+  ACADEMIC
+  RESIDENTIAL
+  OFFICE
+  INDUSTRIAL
+  OTHER
+}
+
+// ============ ENERGY DATA ============
+
+model EnergyReading {
+  id              String    @id @default(cuid())
+  buildingId      String
+  timestamp       DateTime
+  consumptionKwh  Float
+  temperature     Float?
+  occupancy       Int?
+  dayOfWeek       String?
+  isHoliday       Boolean   @default(false)
+  dataSource      DataSource @default(MANUAL)
+  createdAt       DateTime  @default(now())
+
+  // Relations
+  building        Building  @relation(fields: [buildingId], references: [id])
+
+  @@unique([buildingId, timestamp])
+  @@index([buildingId, timestamp])
+  @@index([timestamp])
+}
+
+enum DataSource {
+  MANUAL
+  CSV_IMPORT
+  IOT_METER
+  SIMULATED
+}
+
+// ============ ANOMALY DETECTION ============
+
+model Anomaly {
+  id                String        @id @default(cuid())
+  buildingId        String
+  timestamp         DateTime
+  actualKwh         Float
+  expectedKwh       Float
+  deviationKwh      Float
+  deviationPercent  Float
+  severity          AnomalySeverity
+  status            AnomalyStatus @default(ACTIVE)
+  explanation       String
+  possibleCause     String
+  acknowledgedAt    DateTime?
+  acknowledgedBy    String?
+  resolvedAt        DateTime?
+  resolvedBy        String?
+  dismissedAt       DateTime?
+  dismissedBy       String?
+  notes             String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  // Relations
+  building          Building      @relation(fields: [buildingId], references: [id])
+  recommendations   Recommendation[]
+  tasks             Task[]
+
+  @@index([buildingId, timestamp])
+  @@index([severity])
+  @@index([status])
+}
+
+enum AnomalySeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AnomalyStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  RESOLVED
+  DISMISSED
+}
+
+// ============ RECOMMENDATIONS ============
+
+model Recommendation {
+  id                    String              @id @default(cuid())
+  anomalyId             String
+  action                String
+  reason                String
+  priority              Priority            @default(MEDIUM)
+  estimatedSavingsKwh   Float
+  estimatedSavingsRs    Float
+  verifiedSavingsKwh    Float?
+  verifiedSavingsRs     Float?
+  status                RecommendationStatus @default(PENDING)
+  acceptedBy            String?
+  acceptedAt            DateTime?
+  rejectedAt            DateTime?
+  completedAt           DateTime?
+  notes                 String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  // Relations
+  anomaly               Anomaly             @relation(fields: [anomalyId], references: [id])
+  acceptedByUser        User?               @relation("AcceptedBy", fields: [acceptedBy], references: [id])
+
+  @@index([anomalyId])
+  @@index([status])
+}
+
+enum RecommendationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// ============ TASKS ============
+
+model Task {
+  id            String      @id @default(cuid())
+  title         String
+  description   String?
+  buildingId    String
+  anomalyId     String?
+  assigneeId    String
+  creatorId     String
+  priority      Priority    @default(MEDIUM)
+  status        TaskStatus  @default(OPEN)
+  dueDate       DateTime?
+  completedAt   DateTime?
+  resolutionNotes String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Relations
+  building      Building    @relation(fields: [buildingId], references: [id])
+  anomaly       Anomaly?    @relation(fields: [anomalyId], references: [id])
+  assignee      User        @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  creator       User        @relation("CreatedTasks", fields: [creatorId], references: [id])
+  comments      TaskComment[]
+
+  @@index([assigneeId])
+  @@index([status])
+  @@index([buildingId])
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model TaskComment {
+  id        String    @id @default(cuid())
+  taskId    String
+  userId    String
+  comment   String
+  createdAt DateTime  @default(now())
+
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+}
+
+// ============ SMS & CONTACTS ============
+
+model Contact {
+  id            String    @id @default(cuid())
+  name          String
+  phone         String
+  buildingId    String
+  floor         String?
+  isVerified    Boolean   @default(false)
+  hasOptedIn    Boolean   @default(true)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  building      Building  @relation(fields: [buildingId], references: [id])
+  smsRecords    SMSRecord[]
+
+  @@index([buildingId])
+  @@index([phone])
+  @@index([isVerified, hasOptedIn, isActive])
+}
+
+model SMSCampaign {
+  id              String        @id @default(cuid())
+  buildingId      String?
+  message         String
+  templateId      String?       // DLT template ID (India)
+  recipientCount  Int
+  senderId        String        // Registered sender ID
+  initiatedBy     String
+  status          CampaignStatus @default(DRAFT)
+  scheduledAt     DateTime?
+  sentAt          DateTime?
+  completedAt     DateTime?
+  totalCost       Float?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  user            User          @relation(fields: [initiatedBy], references: [id])
+  records         SMSRecord[]
+
+  @@index([status])
+  @@index([initiatedBy])
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  QUEUED
+  SENDING
+  SENT
+  DELIVERED
+  PARTIALLY_DELIVERED
+  FAILED
+  CANCELLED
+}
+
+model SMSRecord {
+  id              String        @id @default(cuid())
+  campaignId      String
+  contactId       String
+  status          SMSStatus     @default(QUEUED)
+  providerMessageId String?
+  deliveredAt     DateTime?
+  failedAt        DateTime?
+  failureReason   String?
+  retryCount      Int           @default(0)
+  cost            Float?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  campaign        SMSCampaign   @relation(fields: [campaignId], references: [id])
+  contact         Contact       @relation(fields: [contactId], references: [id])
+
+  @@index([campaignId])
+  @@index([contactId])
+  @@index([status])
+}
+
+enum SMSStatus {
+  QUEUED
+  SUBMITTED
+  SENT
+  DELIVERED
+  FAILED
+  UNKNOWN
+  RETRY_PENDING
+}
+
+// ============ AUDIT LOGS ============
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  userId      String?
+  action      String
+  resource    String
+  resourceId  String?
+  details     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+
+  user        User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+}
+
+// ============ SETTINGS & CONFIGURATION ============
+
+model SystemSetting {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  value       Json
+  description String?
+  updatedAt   DateTime  @updatedAt
+
+  @@index([key])
+}
+
+model AnomalyThreshold {
+  id              String          @id @default(cuid())
+  severity        AnomalySeverity
+  deviationPercent Float
+  buildingType    BuildingType?   // null = applies to all
+  timeOfDay       String?         // "night", "day", "weekend", etc.
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([severity])
+}
+
+// ============ FORECASTING ============
+
+model Forecast {
+  id              String    @id @default(cuid())
+  buildingId      String
+  timestamp       DateTime
+  predictedKwh    Float
+  confidenceLower Float?
+  confidenceUpper Float?
+  modelVersion    String
+  createdAt       DateTime  @default(now())
+
+  @@unique([buildingId, timestamp, modelVersion])
+  @@index([buildingId, timestamp])
+}
+
+model ModelMetrics {
+  id              String    @id @default(cuid())
+  modelVersion    String
+  metricType      String    // "MAE", "RMSE", "PRECISION", "RECALL"
+  metricValue     Float
+  evaluationPeriod String   // "last_7_days", "last_30_days", etc.
+  buildingId      String?
+  createdAt       DateTime  @default(now())
+
+  @@index([modelVersion])
+  @@index([metricType])
+}

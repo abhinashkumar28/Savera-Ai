@@ -39,12 +39,20 @@ export default function LandingPage() {
             <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
             <a href="#about" className="hover:text-white transition-colors">About</a>
           </div>
-          <Link
-            to="/dashboard"
-            className="rounded-lg bg-savera-amber px-4 py-2 text-sm font-medium text-savera-bg hover:bg-savera-amber-light transition-colors"
-          >
-            Open Dashboard
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/login"
+              className="text-sm font-medium text-savera-text-dim hover:text-white transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              to="/dashboard"
+              className="rounded-lg bg-savera-amber px-4 py-2 text-sm font-medium text-savera-bg hover:bg-savera-amber-light transition-colors"
+            >
+              Open Dashboard
+            </Link>
+          </div>
         </nav>
 
         {/* Hero Content */}
