@@ -3,7 +3,6 @@ import {
   createOrbitalSphereRenderer,
   ORBITAL_SPHERE_DEFAULTS,
   type OrbitalSphereOptions,
-  type OrbitalSphereRenderer,
 } from "../utils/orbitalSphereRenderer";
 
 export type OrbitalSphereBackgroundProps = Partial<OrbitalSphereOptions> & {
@@ -17,20 +16,30 @@ export function OrbitalSphereBackground({
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const optionsRef = useRef({ ...ORBITAL_SPHERE_DEFAULTS, ...props });
-  const rendererRef = useRef<OrbitalSphereRenderer | null>(null);
 
   optionsRef.current = { ...ORBITAL_SPHERE_DEFAULTS, ...props };
 
   useEffect(() => {
     const host = hostRef.current;
     const canvas = canvasRef.current;
-    if (!host || !canvas) return undefined;
+    
+    // Defensive check: ensure refs are available before proceeding
+    if (!host || !canvas) {
+      console.warn('OrbitalSphereBackground: refs not available');
+      return undefined;
+    }
+    
+    // Check if canvas context is available
+    const testCtx = canvas.getContext('2d');
+    if (!testCtx) {
+      console.warn('OrbitalSphereBackground: canvas 2d context not available');
+      return undefined;
+    }
 
     const renderer = createOrbitalSphereRenderer(
       canvas,
       () => optionsRef.current,
     );
-    rendererRef.current = renderer;
 
     let frame = 0;
     let visible = true;
