@@ -25,6 +25,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(localStorage.getItem('savera_token'));
   const [isLoading, setIsLoading] = useState(true);
 
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    api.setToken(null);
+    localStorage.removeItem('savera_token');
+  };
+
   useEffect(() => {
     // Check if user is logged in on mount
     const checkAuth = async () => {
@@ -54,13 +61,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const response = await api.register(email, password, name, role);
     // Auto-login after registration
     await login(email, password);
-  };
-
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    api.setToken(null);
-    localStorage.removeItem('savera_token');
   };
 
   return (
