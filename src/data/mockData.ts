@@ -323,6 +323,202 @@ export const tasks: Task[] = [
   },
 ];
 
+// ============ WATER MANAGEMENT ============
+
+export interface WaterReading {
+  timestamp: string;
+  hour: number;
+  buildingA: number;
+  buildingB: number;
+  buildingC: number;
+}
+
+export interface WaterAnomaly {
+  id: string;
+  buildingName: string;
+  timestamp: string;
+  actualLiters: number;
+  expectedLiters: number;
+  deviationLiters: number;
+  deviationPercent: number;
+  severity: "Low" | "Medium" | "High" | "Critical";
+  status: "Active" | "Acknowledged" | "Resolved";
+  explanation: string;
+  possibleCause: string;
+}
+
+export const waterReadings: WaterReading[] = Array.from({ length: 24 }, (_, h) => ({
+  timestamp: `${String(h).padStart(2, "0")}:00`,
+  hour: h,
+  buildingA: Math.round((h >= 6 && h <= 20 ? 120 + Math.sin((h - 6) / 14 * Math.PI) * 80 : 30 + Math.random() * 15) * 10) / 10,
+  buildingB: Math.round((h >= 5 && h <= 22 ? 180 + Math.sin((h - 5) / 17 * Math.PI) * 100 : 60 + Math.random() * 20) * 10) / 10,
+  buildingC: Math.round((h >= 8 && h <= 18 ? 60 + Math.sin((h - 8) / 10 * Math.PI) * 40 : 15 + Math.random() * 8) * 10) / 10,
+}));
+
+export const waterAnomalies: WaterAnomaly[] = [
+  {
+    id: "water-001",
+    buildingName: "Building B",
+    timestamp: "2026-01-15T03:00:00",
+    actualLiters: 420,
+    expectedLiters: 180,
+    deviationLiters: 240,
+    deviationPercent: 133,
+    severity: "Critical",
+    status: "Active",
+    explanation: "Overnight water consumption is 133% above expected. This suggests a significant leak or continuous running tap.",
+    possibleCause: "Possible pipe leak in basement, toilet flush mechanism stuck, or irrigation system malfunction.",
+  },
+  {
+    id: "water-002",
+    buildingName: "Building A",
+    timestamp: "2026-01-14T14:00:00",
+    actualLiters: 280,
+    expectedLiters: 200,
+    deviationLiters: 80,
+    deviationPercent: 40,
+    severity: "High",
+    status: "Acknowledged",
+    explanation: "Afternoon water usage is 40% above baseline during normal occupancy hours.",
+    possibleCause: "Extended cleaning schedule, additional events, or inefficient fixtures.",
+  },
+  {
+    id: "water-003",
+    buildingName: "Building C",
+    timestamp: "2026-01-13T10:00:00",
+    actualLiters: 95,
+    expectedLiters: 70,
+    deviationLiters: 25,
+    deviationPercent: 36,
+    severity: "Medium",
+    status: "Resolved",
+    explanation: "Morning consumption slightly elevated. Likely due to additional staff present.",
+    possibleCause: "Higher occupancy than usual or extended use of kitchen facilities.",
+  },
+];
+
+export const waterStats = {
+  totalDailyLiters: 7250,
+  costPerLiter: 0.05,
+  totalDailyCost: 362.5,
+  leakageEstimate: 15,
+  recycledPercentage: 28,
+  rainwaterHarvested: 1200,
+};
+
+// ============ WASTE MANAGEMENT ============
+
+export interface WasteRecord {
+  id: string;
+  buildingName: string;
+  date: string;
+  totalKg: number;
+  organic: number;
+  recyclable: number;
+  hazardous: number;
+  general: number;
+  eWaste: number;
+}
+
+export interface WasteOptimization {
+  id: string;
+  buildingName: string;
+  recommendation: string;
+  impact: string;
+  priority: "Low" | "Medium" | "High";
+  estimatedSavings: string;
+}
+
+export const wasteRecords: WasteRecord[] = [
+  {
+    id: "waste-001",
+    buildingName: "Building A",
+    date: "2026-01-15",
+    totalKg: 85,
+    organic: 32,
+    recyclable: 28,
+    hazardous: 3,
+    general: 18,
+    eWaste: 4,
+  },
+  {
+    id: "waste-002",
+    buildingName: "Building B",
+    date: "2026-01-15",
+    totalKg: 142,
+    organic: 68,
+    recyclable: 35,
+    hazardous: 5,
+    general: 28,
+    eWaste: 6,
+  },
+  {
+    id: "waste-003",
+    buildingName: "Building C",
+    date: "2026-01-15",
+    totalKg: 38,
+    organic: 12,
+    recyclable: 15,
+    hazardous: 2,
+    general: 7,
+    eWaste: 2,
+  },
+];
+
+export const wasteWeeklyData = [
+  { day: "Mon", organic: 95, recyclable: 72, hazardous: 8, general: 48, eWaste: 10 },
+  { day: "Tue", organic: 102, recyclable: 68, hazardous: 9, general: 52, eWaste: 8 },
+  { day: "Wed", organic: 98, recyclable: 75, hazardous: 7, general: 45, eWaste: 12 },
+  { day: "Thu", organic: 110, recyclable: 70, hazardous: 10, general: 50, eWaste: 9 },
+  { day: "Fri", organic: 115, recyclable: 80, hazardous: 12, general: 55, eWaste: 15 },
+  { day: "Sat", organic: 65, recyclable: 40, hazardous: 5, general: 30, eWaste: 6 },
+  { day: "Sun", organic: 55, recyclable: 32, hazardous: 4, general: 25, eWaste: 4 },
+];
+
+export const wasteOptimizations: WasteOptimization[] = [
+  {
+    id: "opt-001",
+    buildingName: "Building B",
+    recommendation: "Install separate organic waste bins in each floor kitchen area to improve composting rates",
+    impact: "Increase organic recycling by 25%",
+    priority: "High",
+    estimatedSavings: "₹2,400/month",
+  },
+  {
+    id: "opt-002",
+    buildingName: "Building A",
+    recommendation: "Set up e-waste collection point and partner with certified recycler",
+    impact: "Reduce hazardous waste disposal costs",
+    priority: "High",
+    estimatedSavings: "₹1,800/month",
+  },
+  {
+    id: "opt-003",
+    buildingName: "Building C",
+    recommendation: "Switch to digital documentation to reduce paper waste by 40%",
+    impact: "Reduce recyclable waste and printing costs",
+    priority: "Medium",
+    estimatedSavings: "₹900/month",
+  },
+  {
+    id: "opt-004",
+    buildingName: "All Buildings",
+    recommendation: "Implement waste audit schedule and train staff on segregation",
+    impact: "Improve overall segregation accuracy from 65% to 85%",
+    priority: "Medium",
+    estimatedSavings: "₹3,500/month",
+  },
+];
+
+export const wasteStats = {
+  totalWeeklyKg: 1840,
+  recyclingRate: 42,
+  compostingRate: 55,
+  hazardousReduction: 12,
+  monthlyCost: 28500,
+  co2Saved: 340,
+};
+
 export const contacts = [
   { id: "c1", name: "Arun Mehta", phone: "+91 98XXX XXX01", building: "Building A", floor: "1", verified: true, optedIn: true },
   { id: "c2", name: "Sneha Reddy", phone: "+91 98XXX XXX02", building: "Building A", floor: "2", verified: true, optedIn: true },

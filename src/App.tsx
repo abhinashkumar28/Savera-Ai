@@ -1,10 +1,13 @@
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import VoiceAssistant from "./components/VoiceAssistant";
 import LandingPage from "./pages/LandingPage";
 import DashboardLayout from "./components/DashboardLayout";
 import OverviewPage from "./pages/OverviewPage";
 import BuildingsPage from "./pages/BuildingsPage";
 import EnergyMonitoringPage from "./pages/EnergyMonitoringPage";
+import WaterManagementPage from "./pages/WaterManagementPage";
+import WasteManagementPage from "./pages/WasteManagementPage";
 import AnomaliesPage from "./pages/AnomaliesPage";
 import ForecastingPage from "./pages/ForecastingPage";
 import RecommendationsPage from "./pages/RecommendationsPage";
@@ -43,6 +46,22 @@ function App() {
             element={
               <DashboardLayout>
                 <EnergyMonitoringPage />
+              </DashboardLayout>
+            }
+          />
+          <Route
+            path="/dashboard/water"
+            element={
+              <DashboardLayout>
+                <WaterManagementPage />
+              </DashboardLayout>
+            }
+          />
+          <Route
+            path="/dashboard/waste"
+            element={
+              <DashboardLayout>
+                <WasteManagementPage />
               </DashboardLayout>
             }
           />
@@ -112,6 +131,8 @@ function App() {
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        {/* Voice Assistant - available on all pages */}
+        <VoiceAssistant />
       </HashRouter>
     </AuthProvider>
   );

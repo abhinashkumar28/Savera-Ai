@@ -36,7 +36,7 @@ export default function OverviewPage() {
         <div className="md:col-span-4 rounded-xl border border-savera-border bg-savera-card p-5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-medium text-savera-text-dim uppercase tracking-wider">Today's Consumption</span>
-            <Zap className="h-4 w-4 text-savera-amber" />
+            <Zap className="h-4 w-4 text-savera-rose" />
           </div>
           <div className="text-3xl font-bold text-white">{totalDailyKwh} <span className="text-base font-normal text-savera-text-dim">kWh</span></div>
           <div className="flex items-center gap-1 mt-2 text-xs">
@@ -105,7 +105,7 @@ export default function OverviewPage() {
             </div>
             <div className="flex items-center gap-3 text-xs">
               <span className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-savera-amber" />
+                <span className="h-2 w-2 rounded-full bg-savera-rose" />
                 Building A
               </span>
               <span className="flex items-center gap-1.5">
@@ -142,8 +142,8 @@ export default function OverviewPage() {
                 <Area
                   type="monotone"
                   dataKey="buildingA"
-                  stroke="#f59e0b"
-                  fill="#f59e0b"
+                  stroke="#AA5E7A"
+                  fill="#AA5E7A"
                   fillOpacity={0.1}
                   strokeWidth={2}
                   name="Building A"
@@ -191,7 +191,7 @@ export default function OverviewPage() {
                     fontSize: "12px",
                   }}
                 />
-                <Bar dataKey="buildingA" fill="#f59e0b" radius={[2, 2, 0, 0]} name="Bld A" />
+                <Bar dataKey="buildingA" fill="#AA5E7A" radius={[2, 2, 0, 0]} name="Bld A" />
                 <Bar dataKey="buildingB" fill="#14b8a6" radius={[2, 2, 0, 0]} name="Bld B" />
                 <Bar dataKey="buildingC" fill="#3b82f6" radius={[2, 2, 0, 0]} name="Bld C" />
               </BarChart>

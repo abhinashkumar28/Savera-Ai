@@ -32,11 +32,11 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-savera-amber/20 border border-savera-amber/30">
-              <Zap className="h-6 w-6 text-savera-amber" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-savera-rose/20 border border-savera-rose/30">
+              <Zap className="h-6 w-6 text-savera-rose" />
             </div>
             <span className="text-xl font-semibold text-white tracking-tight">
-              Savera<span className="text-savera-amber">AI</span>
+              Savera<span className="text-savera-rose">AI</span>
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-white mt-4">Welcome Back</h1>
@@ -84,7 +84,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full rounded-lg bg-savera-amber px-4 py-2.5 text-sm font-semibold text-savera-bg hover:bg-savera-amber-light transition-colors disabled:opacity-50"
+              className="w-full rounded-lg bg-savera-rose px-4 py-2.5 text-sm font-semibold text-white hover:bg-savera-rose-light transition-colors disabled:opacity-50"
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </button>
@@ -96,11 +96,11 @@ export default function LoginPage() {
             <div className="space-y-2 text-xs">
               <div className="flex justify-between">
                 <span className="text-savera-text-dim">Admin:</span>
-                <code className="text-savera-amber">admin@savera.ai / admin123</code>
+                <code className="text-savera-rose">admin@savera.ai / admin123</code>
               </div>
               <div className="flex justify-between">
                 <span className="text-savera-text-dim">Manager:</span>
-                <code className="text-savera-amber">rajesh@savera.ai / manager123</code>
+                <code className="text-savera-rose">rajesh@savera.ai / manager123</code>
               </div>
             </div>
           </div>

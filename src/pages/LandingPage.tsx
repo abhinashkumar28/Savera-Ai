@@ -27,11 +27,11 @@ export default function LandingPage() {
         {/* Navigation */}
         <nav className="relative z-20 flex items-center justify-between px-6 py-5 md:px-12">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-savera-amber/20 border border-savera-amber/30">
-              <Zap className="h-5 w-5 text-savera-amber" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-savera-rose/20 border border-savera-rose/30">
+              <Zap className="h-5 w-5 text-savera-rose" />
             </div>
             <span className="text-lg font-semibold text-white tracking-tight">
-              Savera<span className="text-savera-amber">AI</span>
+              Savera<span className="text-savera-rose">AI</span>
             </span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-savera-text-dim">
@@ -48,7 +48,7 @@ export default function LandingPage() {
             </Link>
             <Link
               to="/dashboard"
-              className="rounded-lg bg-savera-amber px-4 py-2 text-sm font-medium text-savera-bg hover:bg-savera-amber-light transition-colors"
+              className="rounded-lg bg-savera-rose px-4 py-2 text-sm font-medium text-white hover:bg-savera-rose-light transition-colors"
             >
               Open Dashboard
             </Link>
@@ -58,22 +58,22 @@ export default function LandingPage() {
         {/* Hero Content */}
         <div className="relative z-10 flex h-[calc(100vh-80px)] flex-col items-center justify-center px-6 text-center">
           <div className="animate-fade-up">
-            <span className="inline-block rounded-full border border-savera-amber/30 bg-savera-amber/10 px-4 py-1.5 text-xs font-medium text-savera-amber-light tracking-wide uppercase mb-6">
-              AI-Powered Energy Intelligence
+            <span className="inline-block rounded-full border border-savera-rose/30 bg-savera-rose/10 px-4 py-1.5 text-xs font-medium text-savera-rose-light tracking-wide uppercase mb-6">
+              AI-Powered Resource Intelligence
             </span>
             <h1 className="max-w-3xl text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-              Smarter Energy.{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-savera-amber to-savera-teal">
+              Smarter Resources.{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-savera-rose to-savera-teal">
                 Clearer Insights.
               </span>
             </h1>
             <p className="max-w-xl mx-auto text-base md:text-lg text-savera-text-dim mb-10 leading-relaxed">
-              Savera AI monitors electricity consumption across your buildings, detects anomalies before they escalate, and delivers actionable recommendations — all in one intelligent platform.
+              Savera AI monitors energy, water, and waste across your buildings, detects anomalies before they escalate, and delivers actionable recommendations — all in one intelligent platform with voice assistance.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 to="/dashboard"
-                className="flex items-center gap-2 rounded-lg bg-savera-amber px-6 py-3 text-sm font-semibold text-savera-bg hover:bg-savera-amber-light transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-savera-rose px-6 py-3 text-sm font-semibold text-white hover:bg-savera-rose-light transition-colors"
               >
                 Launch Dashboard
                 <ArrowRight className="h-4 w-4" />
@@ -150,17 +150,17 @@ export default function LandingPage() {
               },
               {
                 icon: MessageSquare,
-                title: "SMS Alerts & Messaging",
-                desc: "One-click anomaly notifications to building residents. Bulk messaging for maintenance schedules and energy advisories.",
+                title: "SMS Alerts & Voice Assistant",
+                desc: "One-click anomaly notifications via SMS. Plus a voice assistant that helps non-technical users navigate with simple voice commands.",
                 color: "text-savera-warning",
                 bg: "bg-savera-warning/10",
               },
               {
                 icon: Shield,
-                title: "Role-Based Access",
-                desc: "Secure authentication with admin, facility manager, and staff roles. Building-level access restrictions and audit logs.",
-                color: "text-purple-400",
-                bg: "bg-purple-400/10",
+                title: "Water & Waste Management",
+                desc: "Monitor water consumption, detect leaks, track waste generation by category, and optimize recycling and composting rates.",
+                color: "text-sky-400",
+                bg: "bg-sky-400/10",
               },
             ].map((feature) => (
               <div
@@ -187,10 +187,10 @@ export default function LandingPage() {
               { step: "01", title: "Monitor", desc: "Electricity readings are collected from buildings — via CSV import, simulated data, or future IoT meters." },
               { step: "02", title: "Analyze", desc: "AI compares actual consumption against expected baselines, considering occupancy, weather, and time context." },
               { step: "03", title: "Detect", desc: "Unusual patterns trigger anomaly alerts with severity levels, explanations, and probable causes." },
-              { step: "04", title: "Act", desc: "Get actionable recommendations, send SMS alerts, create tasks, and track verified savings." },
+              { step: "04", title: "Act", desc: "Get recommendations, send SMS alerts, use voice commands, and track verified savings across energy, water, and waste." },
             ].map((item) => (
               <div key={item.step} className="relative">
-                <span className="text-4xl font-bold text-savera-amber/20">{item.step}</span>
+                <span className="text-4xl font-bold text-savera-rose/20">{item.step}</span>
                 <h3 className="text-lg font-semibold text-white mt-2 mb-2">{item.title}</h3>
                 <p className="text-sm text-savera-text-dim leading-relaxed">{item.desc}</p>
               </div>
@@ -206,11 +206,11 @@ export default function LandingPage() {
             Ready to Take Control of Your Energy?
           </h2>
           <p className="text-savera-text-dim mb-8">
-            Launch the Savera AI dashboard to explore energy monitoring, anomaly detection, forecasting, and more — all with simulated data.
+            Launch the Savera AI dashboard to explore energy, water, and waste monitoring with AI anomaly detection, voice assistant, and forecasting — all with simulated data.
           </p>
           <Link
             to="/dashboard"
-            className="inline-flex items-center gap-2 rounded-lg bg-savera-amber px-8 py-3.5 text-sm font-semibold text-savera-bg hover:bg-savera-amber-light transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-savera-rose px-8 py-3.5 text-sm font-semibold text-white hover:bg-savera-rose-light transition-colors"
           >
             Open Dashboard
             <ArrowRight className="h-4 w-4" />
@@ -222,9 +222,9 @@ export default function LandingPage() {
       <footer className="border-t border-savera-border py-8 px-6 md:px-12">
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Zap className="h-4 w-4 text-savera-amber" />
+            <Zap className="h-4 w-4 text-savera-rose" />
             <span className="text-sm font-medium text-savera-text-dim">
-              Savera AI — Intelligent Energy Monitoring
+              Savera AI — Intelligent Resource Monitoring
             </span>
           </div>
           <p className="text-xs text-savera-text-dim">

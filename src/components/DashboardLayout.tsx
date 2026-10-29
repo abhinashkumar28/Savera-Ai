@@ -18,12 +18,16 @@ import {
   X,
   ChevronRight,
   LogOut,
+  Droplets,
+  Trash2,
 } from "lucide-react";
 
 const navItems = [
   { path: "/dashboard", icon: LayoutDashboard, label: "Overview" },
   { path: "/dashboard/buildings", icon: Building2, label: "Buildings" },
   { path: "/dashboard/energy", icon: Activity, label: "Energy Monitoring" },
+  { path: "/dashboard/water", icon: Droplets, label: "Water Management" },
+  { path: "/dashboard/waste", icon: Trash2, label: "Waste Management" },
   { path: "/dashboard/anomalies", icon: AlertTriangle, label: "AI Anomalies" },
   { path: "/dashboard/forecasting", icon: TrendingUp, label: "Forecasting" },
   { path: "/dashboard/recommendations", icon: Lightbulb, label: "Recommendations" },
@@ -59,11 +63,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Logo */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-savera-border">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-savera-amber/20 border border-savera-amber/30">
-              <Zap className="h-4 w-4 text-savera-amber" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-savera-rose/20 border border-savera-rose/30">
+              <Zap className="h-4 w-4 text-savera-rose" />
             </div>
             <span className="text-base font-semibold text-white tracking-tight">
-              Savera<span className="text-savera-amber">AI</span>
+              Savera<span className="text-savera-rose">AI</span>
             </span>
           </Link>
           <button
@@ -86,7 +90,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                     isActive
-                      ? "bg-savera-amber/10 text-savera-amber font-medium"
+                      ? "bg-savera-rose/10 text-savera-rose font-medium"
                       : "text-savera-text-dim hover:text-white hover:bg-savera-card"
                   }`}
                 >
@@ -101,8 +105,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Demo mode badge */}
         <div className="px-4 py-3 border-t border-savera-border">
-          <div className="rounded-lg bg-savera-amber/5 border border-savera-amber/20 px-3 py-2">
-            <p className="text-xs text-savera-amber-light font-medium">Demo Mode</p>
+          <div className="rounded-lg bg-savera-rose/5 border border-savera-rose/20 px-3 py-2">
+            <p className="text-xs text-savera-rose-light font-medium">Demo Mode</p>
             <p className="text-xs text-savera-text-dim mt-0.5">Using simulated data</p>
           </div>
         </div>
@@ -130,15 +134,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {user && (
               <button
                 onClick={() => { logout(); navigate("/login"); }}
-                className="h-8 w-8 rounded-full bg-savera-amber/20 border border-savera-amber/30 flex items-center justify-center hover:bg-savera-amber/30 transition-colors"
+                className="h-8 w-8 rounded-full bg-savera-rose/20 border border-savera-rose/30 flex items-center justify-center hover:bg-savera-rose/30 transition-colors"
                 title="Logout"
               >
-                <LogOut className="h-3.5 w-3.5 text-savera-amber" />
+                <LogOut className="h-3.5 w-3.5 text-savera-rose" />
               </button>
             )}
             {!user && (
-              <div className="h-8 w-8 rounded-full bg-savera-amber/20 border border-savera-amber/30 flex items-center justify-center">
-                <span className="text-xs font-semibold text-savera-amber">A</span>
+              <div className="h-8 w-8 rounded-full bg-savera-rose/20 border border-savera-rose/30 flex items-center justify-center">
+                <span className="text-xs font-semibold text-savera-rose">A</span>
               </div>
             )}
           </div>
