@@ -30,6 +30,7 @@ model User {
   tasks         Task[]         @relation("AssignedTasks")
   createdTasks  Task[]         @relation("CreatedTasks")
   recommendations Recommendation[] @relation("AcceptedBy")
+  managedBuildings Building[] @relation("BuildingManager")
 
   @@index([email])
   @@index([role])
@@ -73,7 +74,6 @@ model Building {
   anomalies     Anomaly[]
   contacts      Contact[]
   tasks         Task[]
-  recommendations Recommendation[]
 
   @@index([campusId])
   @@index([name])

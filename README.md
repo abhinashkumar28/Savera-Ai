@@ -118,7 +118,7 @@ npm install
 # Start development server
 npm run dev
 
-# Open http://localhost:3000
+# Open http://localhost:5173
 ```
 
 The frontend works in **demo mode by default** with simulated data.
@@ -131,9 +131,9 @@ cd backend
 # Install dependencies
 npm install
 
-# Configure environment
+# Configure environment (set GEMINI_API_KEY for the voice assistant)
 cp .env.example .env
-# Edit .env with your database URL and JWT secret
+# Edit .env with your Gemini API key and other required settings
 
 # Setup database
 npm run db:generate
@@ -144,15 +144,11 @@ npm run db:seed
 npm run dev
 ```
 
-Backend runs on `http://localhost:5000`
+Backend runs on `http://localhost:3001`
 
 ### Connect Frontend to Backend
 
-Create `.env` in frontend root:
-```env
-VITE_API_URL=http://localhost:5000/api
-VITE_DEMO_MODE=false
-```
+The frontend's Vite development server proxies `/api` requests to the backend. The floating assistant supports typed and spoken conversations in English, Hindi, and Hinglish. See [backend setup and Gemini quota instructions](./backend/README.md).
 
 ---
 

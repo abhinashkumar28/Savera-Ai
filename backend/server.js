@@ -20,7 +20,7 @@ const winston = require('winston');
 
 const app = express();
 const prisma = new PrismaClient();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 // ============ LOGGING ============
@@ -42,10 +42,22 @@ const logger = winston.createLogger({
 
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (process.env.FRONTEND_URL || 'http://localhost:5173,http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim()),
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({
+  limit: '10mb',
+  verify: (req, res, buffer) => {
+    if (req.path === '/api/chat' && buffer.length > 64 * 1024) {
+      const error = new Error('Chat request is too large.');
+      error.status = 413;
+      error.type = 'entity.too.large';
+      throw error;
+    }
+  }
+}));
 app.use(morgan('combined'));
 
 // Rate limiting
@@ -55,6 +67,134 @@ const apiLimiter = rateLimit({
   message: { error: 'Too many requests, please try again later' }
 });
 app.use('/api/', apiLimiter);
+
+const chatLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many chat requests. Please try again in a few minutes.' }
+});
+
+app.post('/api/chat', chatLimiter, async (req, res) => {
+  if (Number(req.headers['content-length'] || 0) > 64 * 1024) {
+    return res.status(413).json({ error: 'Chat request is too large.' });
+  }
+
+  const chatRequestSchema = z.object({
+    message: z.string().trim().min(1).max(4000),
+    history: z.array(z.object({
+      role: z.enum(['user', 'assistant']),
+      content: z.string().min(1).max(4000)
+    })).max(12).optional().default([])
+  }).strict();
+  const parsed = chatRequestSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({ error: 'Send a message up to 4,000 characters and at most 12 prior messages.' });
+  }
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(503).json({ error: 'Gemini is not configured. Set GEMINI_API_KEY in backend/.env.' });
+  }
+
+  try {
+    const { GoogleGenAI } = await import('@google/genai');
+    const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const fallbackModel = 'gemini-3.5-flash-lite';
+    const model = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+    const conversation = parsed.data.history
+      .map(({ role, content }) => `${role === 'assistant' ? 'Savera AI' : 'User'}: ${content}`)
+      .join('\n');
+    const input = conversation
+      ? `Conversation so far:\n${conversation}\n\nUser: ${parsed.data.message}`
+      : parsed.data.message;
+    const generationOptions = {
+      timeout: 30_000,
+      maxRetries: 0
+    };
+    const createInteraction = async (requestModel) => {
+      const requestStartedAt = Date.now();
+      logger.info('Gemini chat request started', { model: requestModel });
+      const interaction = await genAI.interactions.create({
+        model: requestModel,
+        input,
+        store: false,
+        system_instruction: 'You are Savera AI, a friendly, helpful conversational voice assistant. Understand and respond naturally to informal English, Hindi, and Hinglish, and follow the language and style the user uses. Keep answers clear and conversational. Use prior messages for context when answering follow-up questions.'
+      }, generationOptions);
+      logger.info('Gemini chat request completed', {
+        model: requestModel,
+        durationMs: Date.now() - requestStartedAt,
+        interactionStatus: interaction.status
+      });
+      return interaction;
+    };
+
+    let result;
+    let responseModel = model;
+    try {
+      result = await createInteraction(model);
+    } catch (primaryError) {
+      const primaryMessage = primaryError instanceof Error ? primaryError.message : String(primaryError);
+      const primaryName = primaryError instanceof Error ? primaryError.name : null;
+      const shouldTryFallback = primaryError?.status === 503
+        || primaryError?.status === 504
+        || ['AbortError', 'TimeoutError', 'APIConnectionTimeoutError'].includes(primaryName);
+      if (!shouldTryFallback || model === fallbackModel) throw primaryError;
+
+      const safePrimaryMessage = process.env.GEMINI_API_KEY
+        ? primaryMessage.split(process.env.GEMINI_API_KEY).join('[REDACTED]')
+        : primaryMessage;
+      logger.warn('Gemini primary model failed; trying fallback', {
+        model,
+        fallbackModel,
+        message: safePrimaryMessage,
+        name: primaryName,
+        status: typeof primaryError?.status === 'number' ? primaryError.status : null
+      });
+      responseModel = fallbackModel;
+      result = await createInteraction(fallbackModel);
+    }
+
+    const reply = result.output_text?.trim() || '';
+
+    if (!reply) {
+      logger.error('Gemini returned no text chat response', {
+        model: responseModel,
+        interactionStatus: result.status
+      });
+      return res.status(502).json({ error: 'The AI did not return a response. Please try again.' });
+    }
+
+    return res.json({ reply });
+  } catch (error) {
+    const status = typeof error?.status === 'number' ? error.status : null;
+    const errorName = error instanceof Error ? error.name : null;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const safeErrorMessage = process.env.GEMINI_API_KEY
+      ? errorMessage.split(process.env.GEMINI_API_KEY).join('[REDACTED]')
+      : errorMessage;
+    logger.error('Gemini chat request failed', { message: safeErrorMessage, name: errorName, status });
+    if (status === 429) {
+      return res.status(429).json({ error: 'Gemini quota reached. Check your project limits in Google AI Studio and try again later.' });
+    }
+    if (status === 504 || errorName === 'AbortError' || errorName === 'TimeoutError' || /request timed out/i.test(errorMessage)) {
+      return res.status(504).json({ error: 'The AI service timed out after 30 seconds. Please try again.' });
+    }
+    if (status === 404) {
+      return res.status(502).json({ error: 'The configured Gemini model is unavailable for this API key or project. Check GEMINI_MODEL and your Gemini API access.' });
+    }
+    if (status === 503) {
+      return res.status(503).json({ error: 'Gemini is temporarily unavailable. Please try again shortly.' });
+    }
+    if (status === 401 || status === 403) {
+      return res.status(503).json({ error: 'Gemini rejected the API credentials or project access. Check the key and project permissions in backend/.env and Google AI Studio.' });
+    }
+    if (status === 400) {
+      return res.status(502).json({ error: 'Gemini rejected the request. Check that the selected model is available to this project.' });
+    }
+    return res.status(502).json({ error: 'The AI service could not complete your request. Please try again.' });
+  }
+});
 
 // Stricter rate limit for SMS
 const smsLimiter = rateLimit({
@@ -1189,6 +1329,9 @@ app.get('/api/health', (req, res) => {
 // ============ ERROR HANDLING ============
 
 app.use((err, req, res, next) => {
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Request body is too large.' });
+  }
   logger.error('Unhandled error', err);
   res.status(500).json({ error: 'Internal server error' });
 });
